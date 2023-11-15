@@ -1,5 +1,6 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from "react-hot-toast";
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from "./pages/HomePage";
@@ -21,6 +22,7 @@ function App() {
             <Route path='/register/' element={<UserIsAuthenticated><RegisterPage /></UserIsAuthenticated>}></Route>
             <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           </Routes>
+          <Toaster/>
           <Footer/>
         </AuthProvider>
       </div>

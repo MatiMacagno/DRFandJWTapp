@@ -1,12 +1,13 @@
 import { createContext, useState, useEffect } from 'react'
 import * as jwt_decode from 'jwt-decode';
 import { useNavigate } from 'react-router-dom'
+import { toast } from "react-hot-toast";
 
 const AuthContext = createContext()
 
 export default AuthContext;
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate()
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({children}) => {
         const response = await fetch("http://127.0.0.1:8000/api/register/", {
             method: "POST",
             headers: {
-                "Content-Type":"application/json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 email: e.target.email.value,
@@ -28,10 +29,16 @@ export const AuthProvider = ({children}) => {
                 password2: e.target.password2.value,
             })
         })
-        if(response.status === 201){
+        if (response.status === 201) {
             navigate('/login')
+            toast.success('Register success.', {
+                position: 'bottom-center',
+            })
         } else {
             console.log(response.status);
+            toast.error('Register incomplete', {
+                position: 'bottom-center'
+            })
         }
     }
 
@@ -42,18 +49,27 @@ export const AuthProvider = ({children}) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({email: e.target.email.value, password: e.target.password.value })
+            body: JSON.stringify({ email: e.target.email.value, password: e.target.password.value })
         });
 
-        let data = await response.json();
+        if (!response.ok) {
+            // Manejar errores de red o problemas en el servidor
+            toast.error('Invalid credentials', {
+                position: 'bottom-center'
+            });
+            return;
+        }
 
-        if(data){
+        const data = await response.json();
+
+        if (data && data.access) {
             localStorage.setItem('authTokens', JSON.stringify(data));
-            setAuthTokens(data)
-            setUser(jwt_decode.jwtDecode(data.access))
-            navigate('/')
-        } else {
-            alert('Something went wrong while logging in the user!')
+            setAuthTokens(data);
+            setUser(jwt_decode.jwtDecode(data.access));
+            navigate('/');
+            toast.success('Login success.', {
+                position: 'bottom-center',
+            });
         }
     }
 
@@ -63,55 +79,58 @@ export const AuthProvider = ({children}) => {
         setAuthTokens(null)
         setUser(null)
         navigate('/login')
+        toast.success('Logout success.', {
+            position: 'bottom-center',
+        })
     }
 
     const updateToken = async () => {
         const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
             method: 'POST',
             headers: {
-                'Content-Type':'application/json'
+                'Content-Type': 'application/json'
             },
-            body:JSON.stringify({refresh:authTokens?.refresh})
+            body: JSON.stringify({ refresh: authTokens?.refresh })
         })
-       
+
         const data = await response.json()
         if (response.status === 200) {
             setAuthTokens(data)
             setUser(jwt_decode.jwtDecode(data.access))
-            localStorage.setItem('authTokens',JSON.stringify(data))
+            localStorage.setItem('authTokens', JSON.stringify(data))
         } else {
             logoutUser()
         }
 
-        if(loading){
+        if (loading) {
             setLoading(false)
         }
     }
 
     let contextData = {
-        user:user,
-        authTokens:authTokens,
-        loginUser:loginUser,
-        logoutUser:logoutUser,
-        registerUser:registerUser,
+        user: user,
+        authTokens: authTokens,
+        loginUser: loginUser,
+        logoutUser: logoutUser,
+        registerUser: registerUser,
     }
 
-    useEffect(()=>{
-        if(loading){
+    useEffect(() => {
+        if (loading) {
             updateToken()
         }
 
         const REFRESH_INTERVAL = 1000 * 60 * 4 // 4 minutes
-        let interval = setInterval(()=>{
-            if(authTokens){
+        let interval = setInterval(() => {
+            if (authTokens) {
                 updateToken()
             }
         }, REFRESH_INTERVAL)
         return () => clearInterval(interval)
 
-    },[authTokens, loading])
+    }, [authTokens, loading])
 
-    return(
+    return (
         <AuthContext.Provider value={contextData}>
             {children}
         </AuthContext.Provider>
