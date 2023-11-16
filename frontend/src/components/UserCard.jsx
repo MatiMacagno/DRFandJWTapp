@@ -13,13 +13,13 @@ function UserCard() {
     }
 
     return (
-        <div className='max-w-md mx-auto bg-zinc-700 p-3 rounded-lg mb-4'>
-            <label className='font-semibold text-lg'>Your username</label>
-            <p className='font-semibold mb-4 text-md'>{username}</p>
-            <label className='font-semibold text-lg'>Your full name</label>
-            <p className='font-semibold mb-4 text-md'>{full_name}</p>
-            <label className='font-semibold text-lg'>Your avatar</label>
-            <p className='font-semibold mb-4 text-md'>{image}</p>
+        <div className='max-w-md mx-auto bg-zinc-700 p-3 rounded-lg mb-4 border-2 border-[#E1C78F]'>
+            <h3 className='font-bold text-3xl text-[#F4EAE0]'>Your username</h3>
+            <p className='font-semibold mb-4 text-md text-[#E1C78F]'>{username}</p>
+            <h3 className='font-bold text-3xl text-[#F4EAE0]'>Your full name</h3>
+            <p className='font-semibold mb-4 text-md text-[#E1C78F]'>{full_name}</p>
+            <h3 className='font-bold text-3xl text-[#F4EAE0]'>Your avatar</h3>
+            <p className='font-semibold mb-4 text-md text-[#E1C78F]'>{image}</p>
         </div>
     )
 }

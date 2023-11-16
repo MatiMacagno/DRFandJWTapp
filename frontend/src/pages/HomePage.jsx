@@ -6,7 +6,7 @@ function HomePage () {
   return (
     // Podria ser una card mostrando info del usuario.
     <div className='max-w-xl mx-auto'>
-      <h2 className="font-bold text-3xl mb-4 text-center">Your profile</h2>
+      <h2 className="font-bold text-3xl mb-4 text-center text-[#E1C78F]">Your profile</h2>
       <UserCard/>
     </div>
     )
