@@ -16,17 +16,17 @@ function Navbar() {
         <img src={Logo} alt="logo" width='60px' height='40px' className='ml-8' />
       </Link>
       <Link to='/'>
-        <p className="font-bold text-xl mb-4 mr-4 ml-4 text-[#F4EAE0]">Home</p>
+        <p className="font-bold text-xl mb-4 mr-4 ml-4 text-[#F4EAE0] hover:text-white">Home</p>
       </Link>
       <Link to='/create-tasks'>
-        <p className="font-bold text-xl mb-4 mr-4 text-[#F4EAE0]">Create task</p>
+        <p className="font-bold text-xl mb-4 mr-4 text-[#F4EAE0] hover:text-white">Create task</p>
       </Link>
       <Link to='/tasks'>
-        <p className="font-bold text-xl mb-4 mr-4 text-[#F4EAE0]">Tasks</p>
+        <p className="font-bold text-xl mb-4 mr-4 text-[#F4EAE0] hover:text-white">Tasks</p>
       </Link>
       </div>
       <div>
-        {!user ? null : <button onClick={logoutUser} className='bg-red-500 p-3 font-bold rounded-lg block w-1/8 mx-auto mt-3 mr-8'>Logout</button>}
+        {!user ? null : <button onClick={logoutUser} className='bg-red-500 hover:bg-red-300 p-3 font-bold rounded-lg block w-1/8 mx-auto mt-3 mr-8'>Logout</button>}
       </div>
     </nav>
   )

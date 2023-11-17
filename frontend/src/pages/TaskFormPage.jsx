@@ -1,50 +1,86 @@
-import React, {useEffect} from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { createTask, deleteTask, updateTask, getTask } from "../api/tasks.api";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-function TaskFormPage() {
+export default function TaskFormPage() {
 
-    const navigate = useNavigate()
+  const navigate = useNavigate()
 
-    const authTokens = JSON.parse(localStorage.getItem('authTokens'));
-    
-    const accessToken = authTokens ? authTokens.access : authTokens.refresh;
+  const params = useParams()
 
-    const createdTask = async (e) => {
-        e.preventDefault()
-        const response = await fetch('http://127.0.0.1:8000/api/tasks/', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                title: e.target.title.value,
-                description: e.target.description.value,
-            })
-        }
-        )
-        if (response.status === 201) {
-            navigate('/tasks')
-            toast.success('Task created', {
-                position: 'bottom-center',
-            })
-        }
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm()
+
+  const onSubmit = handleSubmit(async data => {
+    if (params.id) {
+      await updateTask(params.id, data)
+      toast.success('Task updated', {
+        position: 'bottom-center',
+      })
+    } else {
+      await createTask(data)
+      toast.success('Task created', {
+        position: 'bottom-center',
+      })
     }
+    navigate('/tasks/')
+  })
+
+  useEffect(() => {
+    async function loadTask() {
+      if (params.id) {
+        const res = await getTask(params.id)
+        setValue('title', res.data.title)
+        setValue('description', res.data.description)
+      } else {
+        setValue('title', '');
+        setValue('description', '');
+      }
+    }
+    loadTask()
+  }, [params.id])
 
 
-    return (
-        <div className='max-w-xl mx-auto'>
-            <h2 className="font-bold text-3xl mb-4 text-center text-[#E1C78F]">Create your task</h2>
-          <form onSubmit={createdTask}>
-          <label className='font-semibold text-lg text-[#F4EAE0]'>Title</label>
-              <input type="text" name="title" placeholder="Title" className='bg-zinc-700 p-3 rounded-lg block w-full mb-3 text-white'/>
-              <label className='font-semibold text-lg text-[#F4EAE0]'>Description</label>
-              <input type="text" name="description" placeholder="Description" className='bg-zinc-700 p-3 rounded-lg block w-full mb-3 text-white'/>
-              <input type="submit" value='Create' className='bg-green-500 p-3 rounded-lg block w-1/2 mx-auto mt-3 cursor-pointer'/>
-          </form>
-      </div>
-    )
+  return (
+    <div className="max-w-xl mx-auto">
+        {params.id ? <h2 className="font-bold text-3xl mb-4 text-center text-[#E1C78F]">Update Task</h2> : <h2 className="font-bold text-3xl mb-4 text-center text-[#E1C78F]">Create Task</h2>}
+      <form onSubmit={onSubmit}>
+        {params.id ? <label className="font-semibold text-[#F4EAE0]">Title</label> : null}
+        <input
+          className="bg-zinc-700 p-3 rounded-lg block w-full mb-3"
+          type="text"
+          placeholder="Title"
+          {...register('title', { required: true })}
+        />
+        {errors.title && <span>This field is required</span>}
+        {params.id ? <label className="font-semibold text-[#F4EAE0]">Description</label> : null}
+        <textarea
+          className="bg-zinc-700 p-3 rounded-lg block w-full mb-3"
+          rows="3"
+          placeholder="Description"
+          {...register('description', { required: true })}
+        ></textarea>
+        {errors.description && <span>This field is required</span>}
+        <button className="bg-green-500 p-3 rounded-lg block w-48 mt-3 font-bold hover:bg-green-300">Save</button>
+      </form>
+      {
+        params.id &&
+        <div className="flex justify-start">
+          <button
+            className="bg-red-500 p-3 rounded-lg w-48 mt-3 font-bold hover:bg-red-300"
+            onClick={async () => {
+              const accepted = window.confirm('Are you sure?')
+              if (accepted) {
+                await deleteTask(params.id)
+                toast.success('Task deleted', {
+                  position: 'bottom-center',
+                })
+                navigate('/tasks/')
+              }
+            }}>Delete</button>
+        </div>
+      }
+    </div>
+  )
 }
-
-export default TaskFormPage

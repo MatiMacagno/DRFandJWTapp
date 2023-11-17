@@ -29,6 +29,7 @@ function App() {
             <Route path='/register/' element={<UserIsAuthenticated><RegisterPage /></UserIsAuthenticated>}></Route>
             <Route path="/" element={<PrivateRoute><HomePage/></PrivateRoute>} />
             <Route path='/tasks' element={<PrivateRoute><TasksPage/></PrivateRoute>} />
+            <Route path='/tasks/:id' element={<PrivateRoute><TaskFormPage/></PrivateRoute>} />
             <Route path='/create-tasks' element={<PrivateRoute><TaskFormPage/></PrivateRoute>} />
           </Routes>
           </div>
